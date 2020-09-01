@@ -8,18 +8,16 @@
 #      rails_direct_uploads POST /rails/active_storage/direct_uploads(.:format)                                           active_storage/direct_uploads#create
 
 Rails.application.routes.draw do
-  #devise_for :users
-
-  devise_for :users, controllers: { omniauth_callbacks: "auth/omniauth_callbacks"},
-              path: '', path_names: { sign_in: 'login',
-                                      sign_out: 'logout',
-                                      sign_up: 'register' }
-
-  authenticated :user do
-    root to: "home#index"
+  resources :main, only: %i[index new create]
+  devise_for :users, controllers: { omniauth_callbacks: 'auth/omniauth_callbacks'},
+                     path: '', path_names: { sign_in: 'login',
+                                             sign_out: 'logout',
+                                             sign_up: 'register' }
+  unauthenticated :user do
+    root to: 'main#index'
   end
 
-  root to: "main#index", as: nil
-  resources :main, only: [:index, :new, :create]
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+  authenticated :user do
+    root to: 'home#index', as: :authenticated_user
+  end
 end
